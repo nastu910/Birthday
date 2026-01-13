@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Heritage | Anniversary Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;1,600&family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #c5a059;
+            --gold-light: #f3e5ab;
+            --bg: #0a0a0a;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg);
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Hiệu ứng nền khói nhẹ cinematic */
+        .background-overlay {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            z-index: 0;
+        }
+
+        /* Khung chính của thiệp */
+        .luxury-card {
+            position: relative;
+            z-index: 2;
+            width: 80%;
+            max-width: 550px;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            animation: cardFadeIn 3s ease-out;
+        }
+
+        /* Họa tiết 4 góc (Gợi nhớ kiến trúc resort) */
+        .luxury-card::before, .luxury-card::after {
+            content: '';
+            position: absolute;
+            width: 40px; height: 40px;
+            border: 2px solid var(--gold);
+        }
+        .luxury-card::before { top: 15px; left: 15px; border-right: none; border-bottom: none; }
+        .luxury-card::after { bottom: 15px; right: 15px; border-left: none; border-top: none; }
+
+        /* Logo/Monogram phía trên */
+        .monogram {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            letter-spacing: 10px;
+            opacity: 0.8;
+            display: block;
+        }
+
+        /* Tiêu đề Happy Birthday */
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            margin: 0;
+            font-weight: 400;
+            letter-spacing: 5px;
+            color: var(--gold);
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Hiệu ứng ánh sáng chạy ngang chữ (Light Sweep) */
+        h1::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0; top: 0;
+            width: 100%;
+            background: linear-gradient(110deg, transparent 20%, #fff 50%, transparent 80%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s infinite;
+        }
+
+        .divider {
+            height: 1px;
+            width: 100px;
+            background: linear-gradient(to right, transparent, var(--gold), transparent);
+            margin: 40px auto;
+        }
+
+        .message {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            line-height: 2;
+            color: #d1d1d1;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+        }
+
+        .signature {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            color: var(--gold);
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        /* Animation định nghĩa */
+        @keyframes shine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Hạt vàng bay như đom đóm (Anime xịn) */
+        #particles-js {
+            position: absolute;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-overlay"></div>
+    <div id="particles-js"></div>
+
+    <div class="luxury-card">
+        <span class="monogram">H&B</span>
+        <h1 data-text="HAPPY BIRTHDAY">HAPPY BIRTHDAY</h1>
+        
+        <div class="divider"></div>
+        
+        <p class="message">
+            "Sinh nhật vui vẻ nha 🥳." <br>
+            <br>
+            Tuổi mới luôn vui vẻ, gặp nhiều may mắn, <br>
+            thành công trong công việc, tình yêu hạnh phúc.
+        </p>
+        
+        <div class="signature">Limited Edition | MCXXVI</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#c5a059" },
+                "opacity": { "value": 0.4, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } },
+                "size": { "value": 2, "random": true },
+                "line_linked": { "enable": false },
+                "move": {
+                    "enable": true,
+                    "speed": 0.6,
+                    "direction": "top",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            }
+        });
+    </script>
+</body>
+</html>
