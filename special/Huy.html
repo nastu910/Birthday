@@ -22,7 +22,7 @@
             display: flex; justify-content: center; align-items: center;
             overflow: hidden;
             font-family: 'Montserrat', sans-serif;
-            perspective: 1500px; /* Tạo chiều sâu 3D */
+            perspective: 1500px;
         }
 
         .background-overlay {
@@ -43,19 +43,24 @@
         .card-wrapper {
             position: relative;
             z-index: 10;
-            width: 350px; /* Kích thước cố định để mở cho đẹp */
+            
+            /* SỬA ĐỔI: Dùng kích thước linh hoạt thay vì cố định */
+            width: 90vw; /* Chiếm 90% chiều rộng màn hình */
+            max-width: 350px; /* Nhưng không quá 350px trên PC */
             height: 500px;
+            max-height: 80vh; /* Không cao quá 80% màn hình để tránh mất góc trên/dưới mobile */
+            
             cursor: pointer;
             transform-style: preserve-3d;
             transition: transform 1s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Khi mở, đẩy cả khối sang phải chút để cân đối */
+        /* Khi mở trên PC, đẩy sang phải 50px để cân đối */
         .card-wrapper.open {
             transform: translateX(50px);
         }
 
-        /* Phần nội dung bên trong (Nằm dưới) */
+        /* Phần nội dung bên trong */
         .card-inside {
             position: absolute;
             top: 0; left: 0;
@@ -68,30 +73,28 @@
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
-            z-index: 1; /* Nằm dưới bìa */
+            z-index: 1;
         }
 
-        /* Phần bìa thiệp (Nằm trên, sẽ xoay) */
+        /* Phần bìa thiệp */
         .card-front {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background-color: #0f0f0f;
-            /* Họa tiết nền mờ */
             background-image: 
                 radial-gradient(circle at 50% 50%, rgba(197, 160, 89, 0.05) 0%, transparent 60%),
                 repeating-linear-gradient(45deg, rgba(197, 160, 89, 0.03) 0px, rgba(197, 160, 89, 0.03) 1px, transparent 1px, transparent 10px);
             border: 1px solid var(--gold);
-            transform-origin: left center; /* Xoay từ trục bên trái */
+            transform-origin: left center;
             transition: transform 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 2;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             box-shadow: 5px 0 20px rgba(0,0,0,0.5);
-            backface-visibility: hidden; /* Ẩn mặt sau khi xoay */
+            backface-visibility: hidden;
         }
 
-        /* Góc họa tiết trang trí */
         .corner-decoration {
             position: absolute;
             width: 60px; height: 60px;
@@ -104,7 +107,6 @@
         .corner-bottom-left { bottom: 15px; left: 15px; border-right: none; border-top: none; }
         .corner-bottom-right { bottom: 15px; right: 15px; border-left: none; border-top: none; }
 
-        /* Họa tiết hoa văn bên trong góc */
         .corner-decoration::after {
             content: ''; position: absolute;
             width: 10px; height: 10px;
@@ -116,13 +118,12 @@
         .corner-bottom-right::after { bottom: 0; right: 0; }
 
         .card-wrapper:hover .corner-decoration {
-            width: 50px; height: 50px; /* Hiệu ứng co lại khi hover */
+            width: 50px; height: 50px;
             opacity: 1;
         }
 
-        /* Hiệu ứng mở thiệp */
         .card-wrapper.open .card-front {
-            transform: rotateY(-140deg); /* Mở ra 140 độ */
+            transform: rotateY(-140deg);
             box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
 
@@ -174,7 +175,7 @@
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            background: var(--card-bg); /* Che đường kẻ */
+            background: var(--card-bg);
             color: var(--gold);
             font-size: 10px;
             padding: 0 5px;
@@ -199,7 +200,6 @@
             width: 80%;
         }
 
-        /* --- ANIMATIONS --- */
         @keyframes shine {
             to { background-position: 200% center; }
         }
@@ -209,18 +209,31 @@
             100% { opacity: 0.4; }
         }
 
-        /* Mobile adjustments */
+        /* --- SỬA LỖI TRÊN MOBILE --- */
         @media (max-width: 480px) {
             .card-wrapper {
-                width: 85%;
-                height: 450px;
+                /* Đảm bảo vừa màn hình nhỏ */
+                width: 85vw; 
+                height: 480px; /* Giảm chiều cao chút cho cân đối */
             }
-            .card-wrapper.open .card-front {
-                transform: rotateY(-110deg); /* Mở ít hơn trên mobile để không tràn màn hình */
-            }
+
+            /* QUAN TRỌNG: 
+               Trên mobile, không dùng translateX (dịch chuyển ngang) 
+               vì màn hình hẹp, dịch chuyển sẽ làm mất cân đối nội dung.
+               Ta để transform về none hoặc translateZ(0) để giữ vị trí.
+            */
             .card-wrapper.open {
-                transform: translateX(30px);
+                transform: translateX(0); 
             }
+
+            /* Góc mở hẹp hơn trên mobile để bìa không bị tràn ra mép trái quá nhiều */
+            .card-wrapper.open .card-front {
+                transform: rotateY(-115deg);
+            }
+            
+            /* Điều chỉnh lại font size một chút cho mobile */
+            h1 { font-size: 1.5rem; }
+            .monogram { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -256,14 +269,13 @@
                 ♠
             </div>
 
-            <div class="front-title">Click to Open</div>
+            <div class="front-title">Tap to Open</div>
         </div>
 
     </div>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        // Cấu hình Particles
         particlesJS("particles-js", {
             "particles": {
                 "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
@@ -277,7 +289,6 @@
             "retina_detect": true
         });
 
-        // Hàm mở/đóng thiệp
         function toggleCard() {
             const card = document.querySelector('.card-wrapper');
             card.classList.toggle('open');
