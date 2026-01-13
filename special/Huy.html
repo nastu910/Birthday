@@ -10,7 +10,9 @@
         :root {
             --gold: #c5a059;
             --gold-light: #f3e5ab;
+            --gold-shadow: #8a6e36;
             --bg: #0a0a0a;
+            --card-bg: #111;
         }
 
         body, html {
@@ -20,6 +22,7 @@
             display: flex; justify-content: center; align-items: center;
             overflow: hidden;
             font-family: 'Montserrat', sans-serif;
+            perspective: 1500px; /* Tạo chiều sâu 3D */
         }
 
         .background-overlay {
@@ -29,104 +32,195 @@
             z-index: 0;
         }
 
-        .luxury-card {
-            position: relative;
-            z-index: 2;
-            width: 85%;
-            max-width: 550px;
-            padding: 60px 40px;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(197, 160, 89, 0.3);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            text-align: center;
-            animation: cardFadeIn 3s ease-out;
-        }
-
-        .luxury-card::before, .luxury-card::after {
-            content: '';
+        #particles-js {
             position: absolute;
-            width: 40px; height: 40px;
-            border: 2px solid var(--gold);
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
         }
-        .luxury-card::before { top: 15px; left: 15px; border-right: none; border-bottom: none; }
-        .luxury-card::after { bottom: 15px; right: 15px; border-left: none; border-top: none; }
 
+        /* --- CẤU TRÚC THIỆP 3D --- */
+        .card-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 350px; /* Kích thước cố định để mở cho đẹp */
+            height: 500px;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Khi mở, đẩy cả khối sang phải chút để cân đối */
+        .card-wrapper.open {
+            transform: translateX(50px);
+        }
+
+        /* Phần nội dung bên trong (Nằm dưới) */
+        .card-inside {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.1);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1; /* Nằm dưới bìa */
+        }
+
+        /* Phần bìa thiệp (Nằm trên, sẽ xoay) */
+        .card-front {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #0f0f0f;
+            /* Họa tiết nền mờ */
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(197, 160, 89, 0.05) 0%, transparent 60%),
+                repeating-linear-gradient(45deg, rgba(197, 160, 89, 0.03) 0px, rgba(197, 160, 89, 0.03) 1px, transparent 1px, transparent 10px);
+            border: 1px solid var(--gold);
+            transform-origin: left center; /* Xoay từ trục bên trái */
+            transition: transform 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 2;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+            backface-visibility: hidden; /* Ẩn mặt sau khi xoay */
+        }
+
+        /* Góc họa tiết trang trí */
+        .corner-decoration {
+            position: absolute;
+            width: 60px; height: 60px;
+            border: 2px solid var(--gold);
+            opacity: 0.6;
+            transition: all 0.5s ease;
+        }
+        .corner-top-left { top: 15px; left: 15px; border-right: none; border-bottom: none; }
+        .corner-top-right { top: 15px; right: 15px; border-left: none; border-bottom: none; }
+        .corner-bottom-left { bottom: 15px; left: 15px; border-right: none; border-top: none; }
+        .corner-bottom-right { bottom: 15px; right: 15px; border-left: none; border-top: none; }
+
+        /* Họa tiết hoa văn bên trong góc */
+        .corner-decoration::after {
+            content: ''; position: absolute;
+            width: 10px; height: 10px;
+            background: var(--gold);
+        }
+        .corner-top-left::after { top: 0; left: 0; }
+        .corner-top-right::after { top: 0; right: 0; }
+        .corner-bottom-left::after { bottom: 0; left: 0; }
+        .corner-bottom-right::after { bottom: 0; right: 0; }
+
+        .card-wrapper:hover .corner-decoration {
+            width: 50px; height: 50px; /* Hiệu ứng co lại khi hover */
+            opacity: 1;
+        }
+
+        /* Hiệu ứng mở thiệp */
+        .card-wrapper.open .card-front {
+            transform: rotateY(-140deg); /* Mở ra 140 độ */
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- TYPOGRAPHY --- */
         .monogram {
             font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
+            font-size: 3rem;
             color: var(--gold);
             margin-bottom: 20px;
-            letter-spacing: 10px;
-            opacity: 0.8;
-            display: block;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px rgba(197, 160, 89, 0.5);
+        }
+
+        .front-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            margin-top: 100px;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
         }
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: clamp(1.8rem, 8vw, 3rem); /* Tối ưu hiển thị trên mobile */
+            font-size: 1.8rem;
             margin: 0;
-            font-weight: 400;
-            letter-spacing: 5px;
+            letter-spacing: 3px;
             color: var(--gold);
             position: relative;
-            display: inline-block;
-        }
-
-        h1::after {
-            content: attr(data-text);
-            position: absolute;
-            left: 0; top: 0;
-            width: 100%;
-            background: linear-gradient(110deg, transparent 25%, #fff 50%, transparent 75%);
-            background-size: 200% 100%;
+            background: linear-gradient(to right, var(--gold), #fff, var(--gold));
             -webkit-background-clip: text;
-            background-clip: text; /* Fix lỗi thiếu thuộc tính chuẩn */
-            -webkit-text-fill-color: transparent;
-            animation: shine 4s infinite;
-            pointer-events: none; /* Tránh cản trở tương tác chuột */
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: shine 3s linear infinite;
         }
 
         .divider {
             height: 1px;
-            width: 100px;
-            background: linear-gradient(to right, transparent, var(--gold), transparent);
-            margin: 40px auto;
+            width: 60px;
+            background: var(--gold);
+            margin: 20px auto;
+            position: relative;
+        }
+        .divider::before {
+            content: '♦';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg); /* Che đường kẻ */
+            color: var(--gold);
+            font-size: 10px;
+            padding: 0 5px;
         }
 
         .message {
             font-family: 'Playfair Display', serif;
             font-style: italic;
-            font-size: 1.1rem;
-            line-height: 2;
+            font-size: 1rem;
+            line-height: 1.8;
             color: #d1d1d1;
-            margin-bottom: 40px;
-            letter-spacing: 0.5px;
+            margin-bottom: 30px;
         }
 
         .signature {
             font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            letter-spacing: 5px;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
             color: var(--gold);
-            text-transform: uppercase;
-            opacity: 0.6;
+            border-top: 1px solid rgba(197, 160, 89, 0.3);
+            padding-top: 10px;
+            width: 80%;
         }
 
+        /* --- ANIMATIONS --- */
         @keyframes shine {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            to { background-position: 200% center; }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
         }
 
-        @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        #particles-js {
-            position: absolute;
-            width: 100%; height: 100%;
-            z-index: 1;
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .card-wrapper {
+                width: 85%;
+                height: 450px;
+            }
+            .card-wrapper.open .card-front {
+                transform: rotateY(-110deg); /* Mở ít hơn trên mobile để không tràn màn hình */
+            }
+            .card-wrapper.open {
+                transform: translateX(30px);
+            }
         }
     </style>
 </head>
@@ -135,49 +229,59 @@
     <div class="background-overlay"></div>
     <div id="particles-js"></div>
 
-    <div class="luxury-card">
-        <span class="monogram">H&B</span>
-        <h1 data-text="HAPPY BIRTHDAY">HAPPY BIRTHDAY</h1>
+    <div class="card-wrapper" onclick="toggleCard()">
         
-        <div class="divider"></div>
-        
-        <p class="message">
-            "Sinh nhật vui vẻ nha 🥳." <br>
-            <br>
-            Tuổi mới luôn vui vẻ, gặp nhiều may mắn, <br>
-            thành công trong công việc, tình yêu hạnh phúc.
-        </p>
-        
-        <div class="signature">Limited Edition | MMXXVI</div>
+        <div class="card-inside">
+            <h1>HAPPY BIRTHDAY</h1>
+            <div class="divider"></div>
+            
+            <p class="message">
+                "Sinh nhật vui vẻ nha 🥳." <br><br>
+                Tuổi mới luôn vui vẻ, gặp nhiều may mắn, 
+                thành công trong công việc và tình yêu hạnh phúc.
+            </p>
+            
+            <div class="signature">LIMITED EDITION | MMXXVI</div>
+        </div>
+
+        <div class="card-front">
+            <div class="corner-decoration corner-top-left"></div>
+            <div class="corner-decoration corner-top-right"></div>
+            <div class="corner-decoration corner-bottom-left"></div>
+            <div class="corner-decoration corner-bottom-right"></div>
+
+            <span class="monogram">H&B</span>
+            
+            <div style="margin-top: 20px; color: var(--gold); font-size: 20px;">
+                ♠
+            </div>
+
+            <div class="front-title">Click to Open</div>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
+        // Cấu hình Particles
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
                 "color": { "value": "#c5a059" },
-                "opacity": { 
-                    "value": 0.5, 
-                    "random": true, 
-                    "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } 
-                },
+                "opacity": { "value": 0.4, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1 } },
                 "size": { "value": 2, "random": true },
-                "line_linked": { "enable": false },
-                "move": {
-                    "enable": true,
-                    "speed": 0.8,
-                    "direction": "top",
-                    "random": true,
-                    "straight": false,
-                    "out_mode": "out"
-                }
+                "line_linked": { "enable": true, "distance": 150, "color": "#c5a059", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 1, "direction": "top", "random": true, "out_mode": "out" }
             },
-            "interactivity": {
-                "events": { "onhover": { "enable": false }, "onclick": { "enable": false } }
-            },
+            "interactivity": { "events": { "onhover": { "enable": false }, "onclick": { "enable": false } } },
             "retina_detect": true
         });
+
+        // Hàm mở/đóng thiệp
+        function toggleCard() {
+            const card = document.querySelector('.card-wrapper');
+            card.classList.toggle('open');
+        }
     </script>
 </body>
 </html>
