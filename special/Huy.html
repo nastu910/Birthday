@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Heritage | Anniversary Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;1,600&family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #c5a059;
+            --gold-light: #f3e5ab;
+            --gold-shadow: #8a6e36;
+            --bg: #0a0a0a;
+            --card-bg: #111;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg);
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+            perspective: 1500px;
+        }
+
+        .background-overlay {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            z-index: 0;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- CẤU TRÚC THIỆP 3D --- */
+        .card-wrapper {
+            position: relative;
+            z-index: 10;
+            
+            /* SỬA ĐỔI: Dùng kích thước linh hoạt thay vì cố định */
+            width: 90vw; /* Chiếm 90% chiều rộng màn hình */
+            max-width: 350px; /* Nhưng không quá 350px trên PC */
+            height: 500px;
+            max-height: 80vh; /* Không cao quá 80% màn hình để tránh mất góc trên/dưới mobile */
+            
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Khi mở trên PC, đẩy sang phải 50px để cân đối */
+        .card-wrapper.open {
+            transform: translateX(50px);
+        }
+
+        /* Phần nội dung bên trong */
+        .card-inside {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.1);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        /* Phần bìa thiệp */
+        .card-front {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #0f0f0f;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(197, 160, 89, 0.05) 0%, transparent 60%),
+                repeating-linear-gradient(45deg, rgba(197, 160, 89, 0.03) 0px, rgba(197, 160, 89, 0.03) 1px, transparent 1px, transparent 10px);
+            border: 1px solid var(--gold);
+            transform-origin: left center;
+            transition: transform 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 2;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+            backface-visibility: hidden;
+        }
+
+        .corner-decoration {
+            position: absolute;
+            width: 60px; height: 60px;
+            border: 2px solid var(--gold);
+            opacity: 0.6;
+            transition: all 0.5s ease;
+        }
+        .corner-top-left { top: 15px; left: 15px; border-right: none; border-bottom: none; }
+        .corner-top-right { top: 15px; right: 15px; border-left: none; border-bottom: none; }
+        .corner-bottom-left { bottom: 15px; left: 15px; border-right: none; border-top: none; }
+        .corner-bottom-right { bottom: 15px; right: 15px; border-left: none; border-top: none; }
+
+        .corner-decoration::after {
+            content: ''; position: absolute;
+            width: 10px; height: 10px;
+            background: var(--gold);
+        }
+        .corner-top-left::after { top: 0; left: 0; }
+        .corner-top-right::after { top: 0; right: 0; }
+        .corner-bottom-left::after { bottom: 0; left: 0; }
+        .corner-bottom-right::after { bottom: 0; right: 0; }
+
+        .card-wrapper:hover .corner-decoration {
+            width: 50px; height: 50px;
+            opacity: 1;
+        }
+
+        .card-wrapper.open .card-front {
+            transform: rotateY(-140deg);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .monogram {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px rgba(197, 160, 89, 0.5);
+        }
+
+        .front-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            margin-top: 100px;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            margin: 0;
+            letter-spacing: 3px;
+            color: var(--gold);
+            position: relative;
+            background: linear-gradient(to right, var(--gold), #fff, var(--gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: shine 3s linear infinite;
+        }
+
+        .divider {
+            height: 1px;
+            width: 60px;
+            background: var(--gold);
+            margin: 20px auto;
+            position: relative;
+        }
+        .divider::before {
+            content: '♦';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            color: var(--gold);
+            font-size: 10px;
+            padding: 0 5px;
+        }
+
+        .message {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #d1d1d1;
+            margin-bottom: 30px;
+        }
+
+        .signature {
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--gold);
+            border-top: 1px solid rgba(197, 160, 89, 0.3);
+            padding-top: 10px;
+            width: 80%;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+
+        /* --- SỬA LỖI TRÊN MOBILE --- */
+        @media (max-width: 480px) {
+            .card-wrapper {
+                /* Đảm bảo vừa màn hình nhỏ */
+                width: 85vw; 
+                height: 480px; /* Giảm chiều cao chút cho cân đối */
+            }
+
+            /* QUAN TRỌNG: 
+               Trên mobile, không dùng translateX (dịch chuyển ngang) 
+               vì màn hình hẹp, dịch chuyển sẽ làm mất cân đối nội dung.
+               Ta để transform về none hoặc translateZ(0) để giữ vị trí.
+            */
+            .card-wrapper.open {
+                transform: translateX(0); 
+            }
+
+            /* Góc mở hẹp hơn trên mobile để bìa không bị tràn ra mép trái quá nhiều */
+            .card-wrapper.open .card-front {
+                transform: rotateY(-115deg);
+            }
+            
+            /* Điều chỉnh lại font size một chút cho mobile */
+            h1 { font-size: 1.5rem; }
+            .monogram { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-overlay"></div>
+    <div id="particles-js"></div>
+
+    <div class="card-wrapper" onclick="toggleCard()">
+        
+        <div class="card-inside">
+            <h1>HAPPY BIRTHDAY</h1>
+            <div class="divider"></div>
+            
+            <p class="message">
+                "Sinh nhật vui vẻ nha." <br><br>
+                Tuổi mới luôn vui vẻ, gặp nhiều may mắn, 
+                thành công trong công việc và tình yêu hạnh phúc.
+            </p>
+            
+            <div class="signature">LIMITED EDITION | MMXXVI</div>
+        </div>
+
+        <div class="card-front">
+            <div class="corner-decoration corner-top-left"></div>
+            <div class="corner-decoration corner-top-right"></div>
+            <div class="corner-decoration corner-bottom-left"></div>
+            <div class="corner-decoration corner-bottom-right"></div>
+
+            <span class="monogram">H&B</span>
+            
+            <div style="margin-top: 20px; color: var(--gold); font-size: 20px;">
+                ♠
+            </div>
+
+            <div class="front-title">Tap to Open</div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#c5a059" },
+                "opacity": { "value": 0.4, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1 } },
+                "size": { "value": 2, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#c5a059", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 1, "direction": "top", "random": true, "out_mode": "out" }
+            },
+            "interactivity": { "events": { "onhover": { "enable": false }, "onclick": { "enable": false } } },
+            "retina_detect": true
+        });
+
+        function toggleCard() {
+            const card = document.querySelector('.card-wrapper');
+            card.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
