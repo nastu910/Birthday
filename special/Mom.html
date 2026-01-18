@@ -13,6 +13,8 @@
             --primary-gold: #F1C40F;
             --paper-color: #FFFDF5;
             --text-color: #5D4037;
+            
+            /* Kích thước gốc trên PC - GIỮ NGUYÊN */
             --card-width: 300px;
             --card-height: 450px;
         }
@@ -25,7 +27,7 @@
             align-items: center;
             background: radial-gradient(circle at center, #3E2723, #1a0f0f, #000000);
             font-family: 'Playfair Display', serif;
-            overflow: hidden; /* Ngăn cuộn trang */
+            overflow: hidden;
             position: relative;
         }
 
@@ -72,8 +74,17 @@
         }
         .btn-enter:hover { background: var(--primary-gold); color: #000; box-shadow: 0 0 20px var(--primary-gold); }
 
-        /* --- THIỆP CHÍNH --- */
-        #card-container { display: none; perspective: 1500px; z-index: 50; width: 100%; justify-content: center; }
+        /* --- CONTAINER CHÍNH CỦA THIỆP --- */
+        #card-container { 
+            display: none; 
+            perspective: 1500px; 
+            z-index: 50; 
+            /* Flex để căn giữa */
+            justify-content: center; 
+            align-items: center;
+            /* Quan trọng: Để scale hoạt động mượt mà từ tâm */
+            transform-origin: center center;
+        }
 
         .card {
             width: var(--card-width);
@@ -85,8 +96,10 @@
             box-shadow: 0 0 50px rgba(255, 215, 0, 0.1); 
         }
 
-        /* Khi mở thiệp: Dịch sang phải một nửa chiều rộng để nhường chỗ cho mặt bìa lật sang trái */
-        .card.is-open { transform: translateX(50%); }
+        /* Khi mở thiệp: Dịch sang phải 150px (một nửa chiều rộng) để gáy sách nằm giữa màn hình */
+        .card.is-open { 
+            transform: translateX(50%); 
+        }
 
         /* --- CẤU TRÚC TRANG --- */
         .flip-cover {
@@ -113,7 +126,7 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             box-shadow: inset -5px 0 10px rgba(0,0,0,0.1);
             box-sizing: border-box;
-            padding: 10px; /* Thêm padding để chữ không sát lề */
+            padding: 10px;
         }
 
         .page-right {
@@ -181,31 +194,6 @@
             color: #d63031; font-weight: bold; opacity: 0; transition: 1s;
             text-align: center; width: 100%; word-wrap: break-word;
         }
-
-        /* --- MOBILE FIX (Đã chỉnh sửa tối ưu) --- */
-        @media (max-width: 650px) {
-            :root { 
-                /* Giảm xuống 42vw để tổng 2 trang là 84vw, còn dư 16vw lề để không bị cắt */
-                --card-width: 42vw; 
-                --card-height: 60vh; 
-            }
-            
-            /* Dịch chuyển đúng bằng 1/2 chiều rộng thiệp (42/2 = 21vw) */
-            .card.is-open { transform: translateX(21vw); }
-            
-            /* Điều chỉnh kích thước chữ nhỏ hơn để vừa khung */
-            .wishes { font-size: 0.85rem; line-height: 1.4; padding: 5px; }
-            .cover-front h2 { font-size: 1rem; }
-            .happy-text { font-size: 0.9rem; }
-            
-            /* Chỉnh lại vị trí bánh */
-            .cake-container { margin-top: 50px; transform: scale(0.65); }
-            .cake-container:hover { transform: scale(0.7); }
-            
-            .horse-bg { font-size: 50px; }
-            .horse-silhouette { font-size: 60px; }
-            #instruction { font-size: 0.8rem; }
-        }
     </style>
 </head>
 <body>
@@ -233,7 +221,7 @@
                     <div class="wishes">
                         "Chúc Mom tuổi mới<br>
                         Công việc thuận lợi.<br>
-                        Gặp nhiều may mắn trong cuộc sống.<br>
+                        Gặp nhiều may mắn.<br>
                         Lúc nào cũng luôn vui vẻ.<br>
                         Và có thể sống mãi với con."
                     </div>
@@ -263,6 +251,33 @@
     </div>
 
     <script>
+        // --- LOGIC TỰ ĐỘNG SCALE CHO MOBILE ---
+        function adjustScale() {
+            const cardContainer = document.getElementById('card-container');
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            // Kích thước thật của thiệp khi mở ra (300px * 2 = 600px)
+            // Cộng thêm lề (margin) an toàn là 40px -> 640px
+            const requiredWidth = 640; 
+            
+            if (screenWidth < requiredWidth) {
+                // Tính tỷ lệ cần thiết để nhét vừa 640px vào màn hình hiện tại
+                const scale = screenWidth / requiredWidth;
+                
+                // Áp dụng scale
+                cardContainer.style.transform = `scale(${scale})`;
+            } else {
+                // Nếu màn hình to (PC), không scale
+                cardContainer.style.transform = 'scale(1)';
+            }
+        }
+
+        // Chạy hàm scale khi tải trang và khi xoay màn hình
+        window.addEventListener('load', adjustScale);
+        window.addEventListener('resize', adjustScale);
+        // --------------------------------------
+
         // Hiệu ứng hạt lấp lánh nền
         const bgContainer = document.getElementById('bg-decor');
         const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#FFFFFF'];
@@ -295,6 +310,7 @@
             setTimeout(() => {
                 welcome.style.display = 'none';
                 document.getElementById('card-container').style.display = 'flex';
+                adjustScale(); // Tính toán lại scale ngay khi hiện thiệp
                 fireConfetti(0.3);
             }, 800);
         }
@@ -349,4 +365,3 @@
     </script>
 </body>
 </html>
-
