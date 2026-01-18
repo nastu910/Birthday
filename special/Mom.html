@@ -25,7 +25,7 @@
             align-items: center;
             background: radial-gradient(circle at center, #3E2723, #1a0f0f, #000000);
             font-family: 'Playfair Display', serif;
-            overflow: hidden;
+            overflow: hidden; /* Ngăn cuộn trang */
             position: relative;
         }
 
@@ -113,6 +113,7 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             box-shadow: inset -5px 0 10px rgba(0,0,0,0.1);
             box-sizing: border-box;
+            padding: 10px; /* Thêm padding để chữ không sát lề */
         }
 
         .page-right {
@@ -181,25 +182,29 @@
             text-align: center; width: 100%; word-wrap: break-word;
         }
 
-        /* --- MOBILE FIX --- */
+        /* --- MOBILE FIX (Đã chỉnh sửa tối ưu) --- */
         @media (max-width: 650px) {
             :root { 
-                /* Giảm chiều rộng để khi mở (x2) vẫn vừa màn hình điện thoại */
-                --card-width: 45vw; 
-                --card-height: 65vh; 
+                /* Giảm xuống 42vw để tổng 2 trang là 84vw, còn dư 16vw lề để không bị cắt */
+                --card-width: 42vw; 
+                --card-height: 60vh; 
             }
             
-            /* Dịch chuyển khi mở: 45vw / 2 = 22.5vw để tấm thiệp spread đều 2 bên */
-            .card.is-open { transform: translateX(22.5vw); }
+            /* Dịch chuyển đúng bằng 1/2 chiều rộng thiệp (42/2 = 21vw) */
+            .card.is-open { transform: translateX(21vw); }
             
-            .wishes { font-size: 0.9rem; line-height: 1.3; }
-            .cover-front h2 { font-size: 1.1rem; }
-            .happy-text { font-size: 1rem; }
-            .cake-container { margin-top: 60px; transform: scale(0.7); }
-            .cake-container:hover { transform: scale(0.75); }
-            .horse-bg { font-size: 60px; }
+            /* Điều chỉnh kích thước chữ nhỏ hơn để vừa khung */
+            .wishes { font-size: 0.85rem; line-height: 1.4; padding: 5px; }
+            .cover-front h2 { font-size: 1rem; }
+            .happy-text { font-size: 0.9rem; }
+            
+            /* Chỉnh lại vị trí bánh */
+            .cake-container { margin-top: 50px; transform: scale(0.65); }
+            .cake-container:hover { transform: scale(0.7); }
+            
+            .horse-bg { font-size: 50px; }
             .horse-silhouette { font-size: 60px; }
-            #instruction { font-size: 0.9rem; }
+            #instruction { font-size: 0.8rem; }
         }
     </style>
 </head>
